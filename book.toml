@@ -1,0 +1,8 @@
+[book]
+authors = ["Devashish Dixit"]
+multilingual = false
+src = "src"
+title = "Notebook"
+
+[output.html]
+mathjax-support = true
