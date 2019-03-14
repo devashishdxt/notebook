@@ -1,7 +1,7 @@
 language: rust
 cache: cargo
 script:
-  - cargo install mdbook --vers "^0.2.3"
+  - mdbook --version || cargo install mdbook --vers "^0.2.3"
   - mdbook build
 deploy:
   provider: pages
