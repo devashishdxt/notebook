@@ -1,0 +1,15 @@
+language: rust
+script:
+  - cargo install mdbook --vers "^0.2.3"
+  - mdbook build
+deploy:
+  provider: pages
+  skip-cleanup: true
+  github-token: $GITHUB_TOKEN
+  keep-history: true
+  local-dir: ./book
+  on:
+    branch: master
+env:
+  matrix:
+    secure: q6Q/PrJt6qTTKurS5snA0loqedBf0ntsWy8ZPAB6VhsXxl4SQ/aTb+zg/gq1Su0qocVP7NUVxLvHCn2J3RbnvOwA4BBuAghRer4YIS0ZyAtkBXd85ZFMHt7pL+wTlN6YO+NspIT0vecKTe10xg802Zoy1Ao3LAH9QA69J4CSMhtRwWK1otaD5Af6QFtkDrzHRZ3ZHvfNbkeM5XxAwDMpJ9ZAVl1R8QXDzdnBobQePCrjnU+WaB+NaSENklFe6Ewb53GzAnxEBzB3GnUdArMw46alier+TjTrjF0rWcQoFz9IvLr/NPsZdY8XepyW4+mQAwsqFc96NiaT8y2REGRxUOggeuuF1Nmbe+uTaCsI5URk6j9l3fIOU0dkEZhBDa7aaeBIn/di++hKl/e3JmjAOPAHrTd0xse+5slcMH7KBrFScU36DihQcSquVdU28u5t186uR88UNO/tjQYpzN7BA08LNPQ/6oTw3HHuSnbtGwIYGgjsCTosoGPqmEoGkhAQiAEfgd7lprMoxsv5Mm5ny25o26ckYrEE8n2D/fyVjMtrJQCz1IgOFgs/AwA6aKP3TBNDm2ALF8r9O7WX47Xx0ar4sjFwE/808ejyD2kyC35W5j5TD798uKa47Fxjl9SIWvIEkZzP6w/l4kKFyYYUYnSqDa7hKS8v8luwPzt2gn8=

@@ -1,3 +1,3 @@
 # Summary
 
-- [Schnorr Signature](./schnorr_signature.md)
+- [Schnorr Signature Algorithm](./schnorr_signature_algorithm.md)
