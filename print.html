@@ -78,7 +78,7 @@
         </script>
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
-            <ol class="chapter"><li><a href="schnorr_signature_algorithm.html"><strong aria-hidden="true">1.</strong> Schnorr Signature Algorithm</a></li><li><a href="schnorr_musig_scheme.html"><strong aria-hidden="true">2.</strong> Schnorr Multi-Signature Scheme</a></li></ol>
+            <ol class="chapter"><li><a href="schnorr_signature_algorithm.html"><strong aria-hidden="true">1.</strong> Schnorr Signature Algorithm</a></li><li><a href="schnorr_musig_scheme.html"><strong aria-hidden="true">2.</strong> Schnorr Multi-Signature Scheme</a></li><li><a href="avalanche_consensus.html"><strong aria-hidden="true">3.</strong> Avalanche Consensus Algorithm (WIP)</a></li></ol>
         </nav>
 
         <div id="page-wrapper" class="page-wrapper">
@@ -216,6 +216,30 @@ By substitution,
 \[ sG = \sum_{i = 0}^n R_i + \sum_{i = 0}^n \mu_i P_i e\]
 \[ sG = R + Pe\]
 Recipient can verify this equation to verify the signature \( (s, R)\).</p>
+<a class="header" href="#avalanche-consensus-algorithm-wip" id="avalanche-consensus-algorithm-wip"><h1>Avalanche Consensus Algorithm (WIP)</h1></a>
+<p>Avalanche is a new family of consensus protocols inspired by gossip algorithms. The protocol is based
+on random sampling and meta-stable decision, and provide a strong probabilistic safety guarantee.</p>
+<p>This protocol family achieves its properties by humbly cheating in three different ways:</p>
+<ol>
+<li>Adopting a safety guarantee that is probabilistic.</li>
+<li>Establishing only partial order between dependent transactions.</li>
+<li>No liveliness guarantee for misbehaving clients.</li>
+</ol>
+<a class="header" href="#guarantees" id="guarantees"><h2>Guarantees</h2></a>
+<p>Avalanche protocol provides the following guarantees with high probability:</p>
+<ul>
+<li><strong>Safety:</strong> No two correct nodes will accept conflicting transactions.</li>
+<li><strong>Liveliness:</strong> Any transaction issued by a correct client will eventually be accepted by every correct
+node.</li>
+</ul>
+<a class="header" href="#assumptions" id="assumptions"><h2>Assumptions</h2></a>
+<p>Avalanche protocol makes following assumptions:</p>
+<ul>
+<li>A synchronous network.</li>
+<li>All members of a network are not known to all participants.</li>
+<li>A safe bootstrapping system that enables a node to connect with sufficiently many correct nodes.</li>
+</ul>
+<a class="header" href="#approach" id="approach"><h2>Approach</h2></a>
 
                     </main>
 
