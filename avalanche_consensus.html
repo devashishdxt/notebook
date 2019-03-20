@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Avalanche Consensus Algorithm (WIP) - Notebook</title>
+        <title>Avalanche Consensus Protocol - Notebook</title>
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -78,7 +78,7 @@
         </script>
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
-            <ol class="chapter"><li><a href="schnorr_signature_algorithm.html"><strong aria-hidden="true">1.</strong> Schnorr Signature Algorithm</a></li><li><a href="schnorr_musig_scheme.html"><strong aria-hidden="true">2.</strong> Schnorr Multi-Signature Scheme</a></li><li><a href="avalanche_consensus.html" class="active"><strong aria-hidden="true">3.</strong> Avalanche Consensus Algorithm (WIP)</a></li></ol>
+            <ol class="chapter"><li><a href="schnorr_signature_algorithm.html"><strong aria-hidden="true">1.</strong> Schnorr Signature Algorithm</a></li><li><a href="schnorr_musig_scheme.html"><strong aria-hidden="true">2.</strong> Schnorr Multi-Signature Scheme</a></li><li><a href="avalanche_consensus.html" class="active"><strong aria-hidden="true">3.</strong> Avalanche Consensus Protocol</a></li></ol>
         </nav>
 
         <div id="page-wrapper" class="page-wrapper">
@@ -143,7 +143,7 @@
 
                 <div id="content" class="content">
                     <main>
-                        <a class="header" href="#avalanche-consensus-algorithm-wip" id="avalanche-consensus-algorithm-wip"><h1>Avalanche Consensus Algorithm (WIP)</h1></a>
+                        <a class="header" href="#avalanche-consensus-protocol" id="avalanche-consensus-protocol"><h1>Avalanche Consensus Protocol</h1></a>
 <p>Avalanche is a new family of consensus protocols inspired by gossip algorithms. The protocol is based
 on random sampling and meta-stable decision, and provide a strong probabilistic safety guarantee.</p>
 <p>This protocol family achieves its properties by humbly cheating in three different ways:</p>
@@ -167,6 +167,122 @@ node.</li>
 <li>A safe bootstrapping system that enables a node to connect with sufficiently many correct nodes.</li>
 </ul>
 <a class="header" href="#approach" id="approach"><h2>Approach</h2></a>
+<p>Avalance starts with a non-Byzantine protocol and progressively build on it to arrive at Byzantine Fault
+Tolerant (BFT) protocol. It consists of following four protocols:</p>
+<ol>
+<li>Slush</li>
+<li>Snowflake</li>
+<li>Snowball</li>
+<li>Avalanche</li>
+</ol>
+<a class="header" href="#slush-introducing-metastability" id="slush-introducing-metastability"><h3>Slush: Introducing Metastability</h3></a>
+<ul>
+<li>A node starts out with an uncoloured state.</li>
+<li>Upon receiving a transaction, an uncoloured node updates its own colour to the one carried in the
+transaction and initiates a query.</li>
+<li>To perform a query, a node picks a small, constant sized \( (k)\) sanple of the network uniformly
+at random, and sends a query message.</li>
+<li>Upon receiving a query, an uncoloured node adopts the colour in the query, responds with that colour,
+and initiates its own query, whereas a coloured node simply responds with its current colour.</li>
+<li>Once the querying node collects \( k\) responses, it checks if a fraction \( \geq \alpha k\) are
+for the same colour, where \( \alpha \gt 0.5\) is a protocol parameter.</li>
+<li>If the \( \alpha k\) threshold is met and the sampled colour differs from the node's own colour, the
+node flips to that colour.</li>
+<li>It then goes back to the query step , and initiates a subsequent round of query, for a total of
+\( m\) rounds.</li>
+<li>Finally, the node decides the colour it ended up with after \( m\) rounds.</li>
+</ul>
+<a class="header" href="#snowflake-bft" id="snowflake-bft"><h3>Snowflake: BFT</h3></a>
+<ul>
+<li>Each node maintains a counter \( cnt\).</li>
+<li>Upon every colour change, the node resets \( cnt\) to \( 0\).</li>
+<li>Upon every successful query that yields \( \geq \alpha k\) responses for the same colour as the node,
+the node increments \( cnt\).</li>
+<li>A node accepts the current colour when its counter exceeds \( \beta\), another security parameter.</li>
+</ul>
+<a class="header" href="#snowball-adding-confidence" id="snowball-adding-confidence"><h3>Snowball: Adding Confidence</h3></a>
+<ul>
+<li>Each node maintains a <em>confidence counter</em>.</li>
+<li>Upon every successful query, the node increments its confidence counter for that colour.</li>
+<li>A node switches colours when the confidence in its current colour becomes lower than the confidence
+value of the new colour.</li>
+<li>A node decides a colour if, during a certain number of consecutive queries, its confidence for that
+colour exceeds that of other colours.</li>
+</ul>
+<a class="header" href="#avalanche-adding-a-dag" id="avalanche-adding-a-dag"><h3>Avalanche: Adding a DAG</h3></a>
+<ul>
+<li>Each node maintains a dynamic append-only Directed Acyclic Graph (DAG) of all known transactions.</li>
+<li>The DAG has single sink that is <em>genesis vertex</em>.</li>
+<li>When a client creats a transaction, it names one or more <em>parents</em>, which are included inseperably
+in that transaction and form the edges of the DAG.</li>
+</ul>
+<p>We use the term <em>ancestor</em> set to refer to all transactions reachable via parent edges back in history,
+and <em>progeny</em> to refer to all children transactions and their offspring.</p>
+<p>The central challenge in the maintenance of the DAG is to choose among <em>conflicting transactions</em>. For
+example, in a cryptocurrency application, transactions that spend the same funds (<em>double-spends</em>)
+conflict, and form a <em>conflict set</em>, out of which only a single one can be accepted. Note that the conflict
+set of a correct transaction is always a singleton. Also, it is worth noting that each transaction in a
+conflict set may have different parent transaction (this depends on implementation of parent selection).</p>
+<ul>
+<li>When a transaction \( T\) is queried, all transactions reachable from \( T\) by following the DAG
+edges are implicitly part of the query.</li>
+<li>A node will only respond positively to the query if \( T\) and its entire <em>ancestry</em> are currently the
+preeferred option in their respective conflict sets.</li>
+<li>If more than a threshold of responders vote positively, the transaction is said to collect a <em>chit</em>,
+\( c_{uT} = 1\), otherwisem \( c_{uT} = 0\).</li>
+<li>Nodes then compute their <em>confidence</em> as the sum of chit values in the <em>progeny</em> of that transaction.</li>
+<li>Nodes query a transaction just once and rely on new vertices and chits, added to progeny, to build up
+their confidence.</li>
+<li>Ties are broken by an initial preference for the first-seen transactions.</li>
+</ul>
+<a class="header" href="#specification" id="specification"><h2>Specification</h2></a>
+<ul>
+<li>Each correct node \( u\) keeps track of all transactions it has learned about in a set \( \mathcal{T}_u\),
+partitioned into mutually exclusive conflict sets \( \mathcal{P}_T\), where \( T \in \mathcal{T}_u\).
+Since conflicts are transitive, if \( T_i\) and \( T_j\) are conflicting, then
+\( \mathcal P_{T_i} = \mathcal P_{T_j}\)</li>
+<li>We write \( T' \leftarrow T\) if \( T\) has a parent edge to \( T'\).</li>
+<li>Each node \( u\) can compute a confidence value for transaction \( T\), \( d_u(T)\), from the
+progeny as follows:
+\[ d_u(T) = \sum_{T' \in \mathcal T_u, T \leftarrow T'} c_{uT'} \]
+Above formula means that the confidence value of a transaction is sum of confidence values of its
+children. If there are no children, then the confidence value is equal to chit collected by that transaction.</li>
+</ul>
+<style scoped>
+    .chit_confidence {
+        padding-left:20%; 
+        padding-right:20%;
+    }
+
+    @media (max-width: 1100px) {
+        .chit_confidence {
+            padding-left:10%; 
+            padding-right:10%;
+        }
+    }
+</style>
+<div class = "chit_confidence">
+    <img src="./images/chit_confidence.png" />
+</div>
+<a class="header" href="#process" id="process"><h3>Process</h3></a>
+<ul>
+<li>When a node \( u\) discovers a transaction \( T\) through query, it starts a one-time query process by
+samplig \( k\) random peers.</li>
+<li>A query starts by adding \( T\) to \( \mathcal T\), initializing \( c_T\) to \( 0\), and then sending
+a message to selected peers.</li>
+<li>Node \( u\) answers a query by checking wheather each \( T'\) such that \( T' \leftarrow T\) (i.e., every
+parent of \( T\)) is currently preferred among their respective conflict sets, \( \mathcal P_{T'}\).
+<ul>
+<li>If every single ancestor \( T'\) fulfills this criterion, the transaction is said to be <em>strongly preferred</em>,
+and receives a yes-vote(1).</li>
+<li>A failure of this criterion at any \( T'\) yields a no-vote (1).</li>
+</ul>
+</li>
+<li>When \( u\) accumulates \( k\) responses, it checks weather there are \( \alpha k\) yes-votes for \( T\),
+and if so grants the chit \( c_T = 1\) for \( T\).</li>
+</ul>
+<p>The above mentioned process is brief of Avalanche Consensus Algorithm. To understand it fully, it is recommended to
+read <strong>Section 2.6</strong> along with the <strong>pseudo-code</strong> in <a href="https://ipfs.io/ipfs/QmUy4jh5mGNZvLkjies1RWM4YuvJh5o2FYopNPVYwrRVGV">Avalanche Paper</a>.</p>
 
                     </main>
 
