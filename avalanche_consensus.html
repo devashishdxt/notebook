@@ -271,8 +271,8 @@ by its children and their off-springs (<em>progeny</em>).</li>
 sampling \( k\) random peers.</li>
 <li>A query starts by adding \( T\) to \( \mathcal T\), initializing \( c_T\) to \( 0\), and then sending
 a message to selected peers.</li>
-<li>Node \( u\) answers a query by checking weather each \( T'\) such that \( T' \leftarrow T\) (i.e., every
-parent of \( T\)) is currently preferred among their respective conflict sets, \( \mathcal P_{T'}\).
+<li>Node \( u\) answers a query by checking weather each \( T'\) such that \( T' \xleftarrow{\ast} T\) (i.e.,
+every parent of \( T\)) is currently preferred among their respective conflict sets, \( \mathcal P_{T'}\).
 <ul>
 <li>If every single ancestor \( T'\) fulfills this criterion, the transaction is said to be <em>strongly preferred</em>,
 and receives a yes-vote(1).</li>
@@ -284,6 +284,28 @@ and if so grants the chit \( c_T = 1\) for \( T\).</li>
 </ul>
 <p>The above mentioned process is brief of Avalanche Consensus Algorithm. To understand it fully, it is recommended to
 read <strong>Section 2.6</strong> along with the <strong>pseudo-code</strong> in <a href="https://ipfs.io/ipfs/QmUy4jh5mGNZvLkjies1RWM4YuvJh5o2FYopNPVYwrRVGV">Avalanche Paper</a>.</p>
+<a class="header" href="#parent-selection" id="parent-selection"><h3>Parent Selection</h3></a>
+<p>The goal of the parent selection algorithm is to yield a well-structured DAG that maximizes the likelihood that
+virtuous transactions will be quickly accepted by the network.</p>
+<p>There are inherent trade-offs in the parent selection algorithm:</p>
+<ul>
+<li>Selecting well-accepted parents makes it more likely for a transaction to find support, but can lead to vote
+dilution.</li>
+<li>Selecting more recent parents at the frontier of the DAG can lead to stuck transactions, as the parents may turn
+out to be rogue and remain unsupported.</li>
+</ul>
+<p>The adaptive parent selection algorithm chooses parents by starting at the DAG frontier and retreating towards
+the genesis vertex until finding an eligible parent. The eligibility criteria has following four conditions:</p>
+<ul>
+<li>Transaction should be <em>strongly preferred</em>, i.e., every single of its ancestor is preferred among their
+respective conflict sets.</li>
+<li>Transaction's conflict set size should be \( 1\), i.e., there should not be any conflicting transactions to
+current transaction.</li>
+<li>Transaction should have a confidence value, \( d(T) \gt 0\)</li>
+<li>None of this transaction's children should satisfy above three conditions.</li>
+</ul>
+<p>To understand more about <em>parent selection</em>, it is recommended to read <strong>Section 4</strong> along with the <strong>pseudo-code</strong> in
+<a href="https://ipfs.io/ipfs/QmUy4jh5mGNZvLkjies1RWM4YuvJh5o2FYopNPVYwrRVGV">Avalanche Paper</a>.</p>
 
                     </main>
 
