@@ -27,7 +27,7 @@ Avalanche protocol makes following assumptions:
 
 ## Approach
 
-Avalance starts with a non-Byzantine protocol and progressively build on it to arrive at Byzantine Fault 
+Avalanche starts with a non-Byzantine protocol and progressively build on it to arrive at Byzantine Fault 
 Tolerant (BFT) protocol. It consists of following four protocols:
 
 1. Slush
@@ -35,14 +35,14 @@ Tolerant (BFT) protocol. It consists of following four protocols:
 1. Snowball
 1. Avalanche
 
-### Slush: Introducing Metastability
+### Slush: Introducing Meta-stability
 
-- A node starts out with an uncoloured state.
-- Upon receiving a transaction, an uncoloured node updates its own colour to the one carried in the 
+- A node starts out with an uncolored state.
+- Upon receiving a transaction, an uncolored node updates its own colour to the one carried in the 
 transaction and initiates a query.
-- To perform a query, a node picks a small, constant sized \\( (k)\\) sanple of the network uniformly
+- To perform a query, a node picks a small, constant sized \\( (k)\\) sample of the network uniformly
 at random, and sends a query message.
-- Upon receiving a query, an uncoloured node adopts the colour in the query, responds with that colour,
+- Upon receiving a query, an uncolored node adopts the colour in the query, responds with that colour,
 and initiates its own query, whereas a coloured node simply responds with its current colour.
 - Once the querying node collects \\( k\\) responses, it checks if a fraction \\( \geq \alpha k\\) are
 for the same colour, where \\( \alpha \gt 0.5\\) is a protocol parameter.
@@ -73,10 +73,10 @@ colour exceeds that of other colours.
 
 - Each node maintains a dynamic append-only Directed Acyclic Graph (DAG) of all known transactions.
 - The DAG has single sink that is _genesis vertex_.
-- When a client creats a transaction, it names one or more _parents_, which are included inseperably
+- When a client creates a transaction, it names one or more _parents_, which are included inseparably
 in that transaction and form the edges of the DAG.
 
-We use the term _ancestor_ set to refer to all transactions reachable via parent edges back in history, 
+We use the term _ancestor set_ to refer to all transactions reachable via parent edges back in history, 
 and _progeny_ to refer to all children transactions and their offspring.
 
 The central challenge in the maintenance of the DAG is to choose among _conflicting transactions_. For 
@@ -88,9 +88,9 @@ conflict set may have different parent transaction (this depends on implementati
 - When a transaction \\( T\\) is queried, all transactions reachable from \\( T\\) by following the DAG
 edges are implicitly part of the query.
 - A node will only respond positively to the query if \\( T\\) and its entire _ancestry_ are currently the
-preeferred option in their respective conflict sets.
+preferred option in their respective conflict sets.
 - If more than a threshold of responders vote positively, the transaction is said to collect a _chit_, 
-\\( c_{uT} = 1\\), otherwisem \\( c_{uT} = 0\\).
+\\( c_{uT} = 1\\), otherwise \\( c_{uT} = 0\\).
 - Nodes then compute their _confidence_ as the sum of chit values in the _progeny_ of that transaction.
 - Nodes query a transaction just once and rely on new vertices and chits, added to progeny, to build up
 their confidence.
@@ -128,10 +128,10 @@ children. If there are no children, then the confidence value is equal to chit c
 ### Process
 
 - When a node \\( u\\) discovers a transaction \\( T\\) through query, it starts a one-time query process by
-samplig \\( k\\) random peers.
+sampling \\( k\\) random peers.
 - A query starts by adding \\( T\\) to \\( \mathcal T\\), initializing \\( c_T\\) to \\( 0\\), and then sending
 a message to selected peers.
-- Node \\( u\\) answers a query by checking wheather each \\( T'\\) such that \\( T' \leftarrow T\\) (i.e., every 
+- Node \\( u\\) answers a query by checking weather each \\( T'\\) such that \\( T' \leftarrow T\\) (i.e., every 
 parent of \\( T\\)) is currently preferred among their respective conflict sets, \\( \mathcal P_{T'}\\).
   - If every single ancestor \\( T'\\) fulfills this criterion, the transaction is said to be _strongly preferred_,
   and receives a yes-vote(1).
