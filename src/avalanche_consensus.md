@@ -137,7 +137,7 @@ a message to selected peers.
 every parent of \\( T\\)) is currently preferred among their respective conflict sets, \\( \mathcal P_{T'}\\).
   - If every single ancestor \\( T'\\) fulfills this criterion, the transaction is said to be _strongly preferred_,
   and receives a yes-vote(1).
-  - A failure of this criterion at any \\( T'\\) yields a no-vote (1).
+  - A failure of this criterion at any \\( T'\\) yields a no-vote (0).
 - When \\( u\\) accumulates \\( k\\) responses, it checks weather there are \\( \alpha k\\) yes-votes for \\( T\\),
 and if so grants the chit \\( c_T = 1\\) for \\( T\\).
 
