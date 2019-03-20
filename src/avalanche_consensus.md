@@ -133,8 +133,8 @@ by its children and their off-springs (_progeny_).
 sampling \\( k\\) random peers.
 - A query starts by adding \\( T\\) to \\( \mathcal T\\), initializing \\( c_T\\) to \\( 0\\), and then sending
 a message to selected peers.
-- Node \\( u\\) answers a query by checking weather each \\( T'\\) such that \\( T' \leftarrow T\\) (i.e., every 
-parent of \\( T\\)) is currently preferred among their respective conflict sets, \\( \mathcal P_{T'}\\).
+- Node \\( u\\) answers a query by checking weather each \\( T'\\) such that \\( T' \xleftarrow{\ast} T\\) (i.e., 
+every parent of \\( T\\)) is currently preferred among their respective conflict sets, \\( \mathcal P_{T'}\\).
   - If every single ancestor \\( T'\\) fulfills this criterion, the transaction is said to be _strongly preferred_,
   and receives a yes-vote(1).
   - A failure of this criterion at any \\( T'\\) yields a no-vote (1).
@@ -143,5 +143,29 @@ and if so grants the chit \\( c_T = 1\\) for \\( T\\).
 
 The above mentioned process is brief of Avalanche Consensus Algorithm. To understand it fully, it is recommended to
 read **Section 2.6** along with the **pseudo-code** in [Avalanche Paper].
+
+### Parent Selection
+
+The goal of the parent selection algorithm is to yield a well-structured DAG that maximizes the likelihood that 
+virtuous transactions will be quickly accepted by the network.
+
+There are inherent trade-offs in the parent selection algorithm:
+- Selecting well-accepted parents makes it more likely for a transaction to find support, but can lead to vote 
+dilution.
+- Selecting more recent parents at the frontier of the DAG can lead to stuck transactions, as the parents may turn 
+out to be rogue and remain unsupported.
+
+The adaptive parent selection algorithm chooses parents by starting at the DAG frontier and retreating towards
+the genesis vertex until finding an eligible parent. The eligibility criteria has following four conditions:
+
+- Transaction should be _strongly preferred_, i.e., every single of its ancestor is preferred among their
+respective conflict sets.
+- Transaction's conflict set size should be \\( 1\\), i.e., there should not be any conflicting transactions to
+current transaction.
+- Transaction should have a confidence value, \\( d(T) \gt 0\\)
+- None of this transaction's children should satisfy above three conditions.
+
+To understand more about _parent selection_, it is recommended to read **Section 4** along with the **pseudo-code** in 
+[Avalanche Paper].
 
 [Avalanche Paper]: https://ipfs.io/ipfs/QmUy4jh5mGNZvLkjies1RWM4YuvJh5o2FYopNPVYwrRVGV
