@@ -105,9 +105,9 @@ Since conflicts are transitive, if \\( T_i\\) and \\( T_j\\) are conflicting, th
 - We write \\( T' \leftarrow T\\) if \\( T\\) has a parent edge to \\( T'\\).
 - Each node \\( u\\) can compute a confidence value for transaction \\( T\\), \\( d_u(T)\\), from the
 progeny as follows:
-\\[ d_u(T) = \sum_{T' \in \mathcal T_u, T \leftarrow T'} c\_{uT'} \\]
-Above formula means that the confidence value of a transaction is sum of confidence values of its
-children. If there are no children, then the confidence value is equal to chit collected by that transaction.
+\\[ d_u(T) = \sum_{T' \in \mathcal T_u, T \xleftarrow{\ast} T'} c\_{uT'} \\]
+Above formula means that the _confidence value_ of a transaction is sum of chits collected 
+by its children and their off-springs (_progeny_).
 <style scoped>
     .chit_confidence {
         padding-left:20%; 
@@ -124,6 +124,8 @@ children. If there are no children, then the confidence value is equal to chit c
 <div class = "chit_confidence">
     <img src="./images/chit_confidence.png" />
 </div>
+
+**Note:** Above image is just for providing an example and the values may not be accurate.
 
 ### Process
 
